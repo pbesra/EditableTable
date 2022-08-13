@@ -70,6 +70,7 @@ function onDblClickHandler(id, event, cellStyle) {
             var inputElem = document.createElement('input');
             inputElem = setAttribute(inputElem, columns[i]);
             inputElem = setStyle(inputElem, columns[i], cellStyle);
+            inputElem.value = deletableNode.firstChild.nodeValue;
             eventTds[i].appendChild(inputElem);
             snapshot.push({ rowId: id, eventNode: deletableNode, inputNode: inputElem, colName: columns[i] });
             break;
