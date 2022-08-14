@@ -52,26 +52,15 @@ function setAttribute(node, colName) {
     return node;
 }
 
-function out(item) {
-    console.log(item);
-}
-
 function modifyTree(root, newNode, parent, textValue) {
-
-
     if (root.tagName.toLowerCase() !== 'img' && root.children.length === 0) {
-
         textValue = root.innerText;
         parent.removeChild(root);
-
-
         return textValue;
     }
     var children = root.children;
     for (var i = 0; i < children.length; i++) {
-
         textValue = modifyTree(children[i], newNode, root, textValue);
-
     }
     return { root: root, textValue: textValue };
 
@@ -89,16 +78,12 @@ function onDblClickHandler(id, event, cellStyle) {
     }
     var eventNode = event.target ?? event.srcElement;
     var eventTds = document.getElementById(id).querySelectorAll("td");
-
     for (var i = 0; i < eventTds.length; i++) {
 
         if (isEditable(i)) {
-            const tdChild = eventTds[i].firstElementChild;
-            var snapObj = {
-                rowId: id,
-                eventNode: tdChild,
-                colName: columns[i],
-            }
+            console.log('eventTds[i].firstElementChild: ');
+            console.log(eventTds[i].firstElementChild);
+            const tdChild = eventTds[i].firstElementChild.cloneNode(true);
             var deletableNode = eventTds[i].firstElementChild;
             if (eventTds[i] === eventNode) {
                 deletableNode = eventNode.firstElementChild;
@@ -109,20 +94,19 @@ function onDblClickHandler(id, event, cellStyle) {
             inputElem = setAttribute(inputElem, columns[i]);
             inputElem = setStyle(inputElem, columns[i], cellStyle);
             inputElem.style.width = '100px';
-
             var updatedRoot = modifyTree(deletableNode, inputElem, eventTds[i], '');
-
             inputElem.value = updatedRoot.textValue;
             updatedRoot.root.appendChild(inputElem);
             eventTds[i].appendChild(updatedRoot.root);
-            snapObj = {
-                ...snapObj,
+            const snapObj = {
+                rowId: id,
+                colName: columns[i],
+                eventNode: tdChild,
                 inputNode: updatedRoot.root,
                 inputValue: updatedRoot.textValue,
             }
             snapshot.push(snapObj);
-            console.log('snapshot: ');
-            console.log(snapshot);
+
         }
     }
 }
@@ -142,23 +126,12 @@ function restoreTable() {
     for (var k = 0; k < snapshot.length; k++) {
         var obj = snapshot[k];
         var rowTds = document.getElementById(obj.rowId).querySelectorAll("td");
-        console.log(rowTds);
         for (var t = 1; t < rowTds.length; t++) {
-
             if (rowTds[t].contains(obj.inputNode)) {
-                console.log('before rowTds: ');
-                console.log(rowTds[t]);
-                console.log('obj.inputNode: ');
-                console.log(obj.inputNode);
-                console.log('obj.eventNode: ');
-                console.log(obj.eventNode);
                 obj.inputValue = obj.inputNode.value;
                 snapshot[k] = obj;
-                // rowTds[t].removeChild(obj.inputNode);
-                // rowTds[t].appendChild(obj.eventNode);
-                rowTds[i]?.replaceChild(obj.eventNode, obj.inputNode);
-                console.log('after rowTds: ');
-                console.log(rowTds[t]);
+                rowTds[t].removeChild(obj.inputNode);
+                rowTds[t].appendChild(obj.eventNode);
                 break;
             }
         }
